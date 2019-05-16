@@ -4,14 +4,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/aware-hq/azure-key-vault-controller/pkg/controller/azurekeyvaultsecret"
 	"os"
 	"runtime"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"aware.work/aware-operator/azure-key-vault-controller/pkg/apis"
-	"aware.work/aware-operator/azure-key-vault-controller/pkg/controller"
+	"github.com/aware-hq/azure-key-vault-controller/pkg/apis"
+	"github.com/aware-hq/azure-key-vault-controller/pkg/controller"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
@@ -28,7 +29,7 @@ import (
 // Change below variables to serve metrics on different host or port.
 var (
 	metricsHost       = "0.0.0.0"
-	metricsPort int32 = 8383
+	metricsPort int32 = 9104
 )
 var log = logf.Log.WithName("cmd")
 
@@ -46,6 +47,7 @@ func main() {
 	// Add flags registered by imported packages (e.g. glog and
 	// controller-runtime)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+	pflag.CommandLine.AddFlagSet(azurekeyvaultsecret.FlagSet())
 
 	pflag.Parse()
 
