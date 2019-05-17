@@ -2,13 +2,13 @@ package azurekeyvaultsecret
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/base64"
 	"fmt"
-	"github.com/spf13/pflag"
 	secretsv1alpha1 "github.com/aware-hq/azure-key-vault-controller/pkg/apis/secrets/v1alpha1"
 	kvc "github.com/aware-hq/azure-key-vault-controller/pkg/azurekeyvault/client"
+	"github.com/spf13/pflag"
+	"reflect"
 
+	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +22,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 )
 
 var (
@@ -146,11 +145,7 @@ func (r *ReconcileAzureKeyVaultSecret) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{}, err
 	}
 
-	ok, err := compareHashes(found, secret)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
+	ok := compareHashes(found, secret)
 	if ok {
 		// Secret already exists - don't requeue
 		reqLogger.Info("Skip reconcile: Secret already exists", "Secret.Namespace", found.Namespace, "Secret.Name", found.Name)
@@ -167,18 +162,20 @@ func (r *ReconcileAzureKeyVaultSecret) Reconcile(request reconcile.Request) (rec
 	}
 }
 
-func compareHashes(found, secret *corev1.Secret) (bool, error) {
-	foundHash, err := calculateSecretHash(found)
-	if err != nil {
-		return false, err
+func compareHashes(found, secret *corev1.Secret) bool {
+	if !reflect.DeepEqual(found.Annotations, secret.Annotations) {
+		return false
 	}
 
-	secretHash, err := calculateSecretHash(secret)
-	if err != nil {
-		return false, err
+	if !reflect.DeepEqual(found.Labels, secret.Labels) {
+		return false
 	}
 
-	return foundHash == secretHash, nil
+	if !reflect.DeepEqual(found.Data, secret.Data) {
+		return false
+	}
+
+	return true
 }
 
 func getKeysClient() (keyvault.BaseClient, error) {
@@ -206,7 +203,7 @@ func getCredentials() (*kvc.AzureKeyVaultCredentials, error) {
 	}
 }
 
-// newPodForCR returns a busybox pod with the same name/namespace as the cr
+// newSecretForCr returns a secret with the same name/namespace as the cr and the content of the referenced keyvault secrets
 func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret) (*corev1.Secret, error) {
 	kv, err := getKeysClient()
 	if err != nil {
@@ -239,33 +236,4 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret) (*corev1.Secret, er
 		},
 		Data: data,
 	}, nil
-}
-
-
-func calculateSecretHash(secret *corev1.Secret) (string, error) {
-	if secret == nil {
-		return "", nil
-	}
-
-	annotations := fmt.Sprint(secret.Annotations)
-	labels := fmt.Sprint(secret.Labels)
-	data := fmt.Sprint(secret.Data)
-	h := sha256.New()
-	_, err := h.Write([]byte(annotations))
-	if err != nil {
-		return "", err
-	}
-
-	_, err = h.Write([]byte(labels))
-	if err != nil {
-		return "", err
-	}
-
-	_, err = h.Write([]byte(data))
-	if err != nil {
-		return "", err
-	}
-
-	hash := h.Sum(nil)
-	return base64.StdEncoding.EncodeToString(hash), nil
 }
