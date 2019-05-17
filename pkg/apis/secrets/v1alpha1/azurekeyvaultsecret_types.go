@@ -18,8 +18,12 @@ type AzureKeyVaultSecretSpec struct {
 
 type AzureKeyVaultSecretEntry struct {
 	Key string `json:"key"`
-	Name string `json:"name"`
+	// +optional
+	Name string `json:"name,omitempty"`
+	// +optional
 	Version string `json:"version,omitempty"`
+	// +optional
+	WriteToFile bool `json:"isfile,omitempty"`
 }
 
 // AzureKeyVaultSecretStatus defines the observed state of AzureKeyVaultSecret

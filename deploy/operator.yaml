@@ -16,7 +16,7 @@ spec:
       containers:
         - name: azure-key-vault-controller
           # Replace this with the built image name
-          image: REPLACE_IMAGE
+          image: awareoss/azurekeyvaultcontroller:v0.0.1
           command:
           - azure-key-vault-controller
           imagePullPolicy: Always

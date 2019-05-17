@@ -7,6 +7,7 @@ import (
 	kvc "github.com/aware-hq/azure-key-vault-controller/pkg/azurekeyvault/client"
 	"github.com/spf13/pflag"
 	"reflect"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	corev1 "k8s.io/api/core/v1"
@@ -210,26 +211,34 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret) (*corev1.Secret, er
 		return nil, err
 	}
 
-	var files []string
+	var files strings.Builder
 	data := map[string][]byte{}
 	for _, value := range cr.Spec.Secrets {
+		var secretName string
+		if value.Name != "" {
+			secretName = value.Name
+		} else {
+			secretName = value.Key
+		}
 		secret, err := kv.GetSecret(context.TODO(), cr.Spec.KeyVault, value.Key, value.Version)
 		if err != nil {
 			return nil, fmt.Errorf("unable to process key %s in secret %s: %v", value.Key, cr.ObjectMeta.Name, err)
 		}
 
-		if _, ok := secret.Tags["write-to-file"]; ok {
-			files = append(files, value.Key)
+		if value.WriteToFile {
+			files.WriteString(fmt.Sprintf("- %s\n", secretName))
 		}
 
 		if secret.Value != nil {
-			data[value.Name] = []byte(*secret.Value)
+			data[secretName] = []byte(*secret.Value)
 		}
 	}
 
 	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: cr.Annotations,
+			Annotations: map[string]string {
+				"configuration.aware.work/write-tofile": files.String(),
+			},
 			Name:      cr.Name,
 			Namespace: cr.Namespace,
 			Labels:    cr.ObjectMeta.Labels,
