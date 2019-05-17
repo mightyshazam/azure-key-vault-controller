@@ -14,8 +14,14 @@
   version = "v0.4.12"
 
 [[projects]]
+  name = "github.com/Azure/azure-sdk-for-go"
+  packages = ["services/keyvault/2016-10-01/keyvault","version"]
+  revision = "77258e94d84ea36012a72c0e0a1e2faa409c6396"
+  version = "v29.0.0"
+
+[[projects]]
   name = "github.com/Azure/go-autorest"
-  packages = ["autorest","autorest/adal","autorest/azure","autorest/date","logger","tracing"]
+  packages = ["autorest","autorest/adal","autorest/azure","autorest/azure/auth","autorest/azure/cli","autorest/date","autorest/to","autorest/validation","logger","tracing"]
   revision = "fe1ebaab71ae2a2ab8a55f62ebe54cffd842acc2"
   version = "v12.0.0"
 
@@ -66,6 +72,12 @@
   packages = ["."]
   revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
   version = "v3.2.0"
+
+[[projects]]
+  name = "github.com/dimchansky/utfbom"
+  packages = ["."]
+  revision = "d2133a1ce379ef6fa992b0514a77146c60db9d1c"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/emicklei/go-restful"
@@ -230,6 +242,12 @@
   version = "v1.0.1"
 
 [[projects]]
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "af06845cf3004701891bf4fdb884bfe4920b3727"
+  version = "v1.1.0"
+
+[[projects]]
   name = "github.com/modern-go/concurrent"
   packages = ["."]
   revision = "bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94"
@@ -340,7 +358,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = ["pkcs12","pkcs12/internal/rc2","ssh/terminal"]
   revision = "22d7a77e9e5f409e934ed268692e56707cd169e5"
 
 [[projects]]
@@ -464,8 +482,14 @@
   revision = "0cf8f7e6ed1d2e3d47d02e3b6e559369af24d803"
 
 [[projects]]
+  name = "k8s.io/kubernetes"
+  packages = ["pkg/cloudprovider/providers/azure/auth"]
+  revision = "66049e3b21efe110454d67df4fa62b08ea79a19b"
+  version = "v1.14.2"
+
+[[projects]]
   name = "sigs.k8s.io/controller-runtime"
-  packages = ["pkg/cache","pkg/cache/internal","pkg/client","pkg/client/apiutil","pkg/client/config","pkg/internal/recorder","pkg/leaderelection","pkg/manager","pkg/metrics","pkg/patch","pkg/recorder","pkg/runtime/inject","pkg/runtime/log","pkg/runtime/signals","pkg/webhook/admission","pkg/webhook/admission/types","pkg/webhook/internal/metrics","pkg/webhook/types"]
+  packages = ["pkg/cache","pkg/cache/internal","pkg/client","pkg/client/apiutil","pkg/client/config","pkg/controller","pkg/controller/controllerutil","pkg/event","pkg/handler","pkg/internal/controller","pkg/internal/controller/metrics","pkg/internal/recorder","pkg/leaderelection","pkg/manager","pkg/metrics","pkg/patch","pkg/predicate","pkg/reconcile","pkg/recorder","pkg/runtime/inject","pkg/runtime/log","pkg/runtime/scheme","pkg/runtime/signals","pkg/source","pkg/source/internal","pkg/webhook/admission","pkg/webhook/admission/types","pkg/webhook/internal/metrics","pkg/webhook/types"]
   revision = "12d98582e72927b6cd0123e2b4e819f9341ce62c"
   version = "v0.1.10"
 
@@ -484,6 +508,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8bc88accb6b977444e189022696491ac24fd5e25c4ea2ebb4b2b573a42d5416f"
+  inputs-digest = "e7a58ac5dd23cacc8a246b0e07d5f47c2620413d412f73a7a4bc0d972ae942d0"
   solver-name = "gps-cdcl"
   solver-version = 1
