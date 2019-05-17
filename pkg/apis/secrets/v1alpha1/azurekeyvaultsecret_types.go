@@ -12,8 +12,8 @@ import (
 type AzureKeyVaultSecretSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	KeyVault string `json:"keyvault"`
-	Secrets []AzureKeyVaultSecretEntry `json:"secrets"`
+	KeyVault string                     `json:"keyvault"`
+	Secrets  []AzureKeyVaultSecretEntry `json:"secrets"`
 }
 
 type AzureKeyVaultSecretEntry struct {

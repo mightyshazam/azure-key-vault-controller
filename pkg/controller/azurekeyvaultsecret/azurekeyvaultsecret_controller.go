@@ -26,10 +26,10 @@ import (
 )
 
 var (
-	flagSet *pflag.FlagSet
-	log      = logf.Log.WithName("controller_azurekeyvaultsecret")
+	flagSet                      *pflag.FlagSet
+	log                          = logf.Log.WithName("controller_azurekeyvaultsecret")
 	useAzureEnvironmentVariables bool
-	azureConfig string
+	azureConfig                  string
 )
 
 /**
@@ -236,7 +236,7 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret) (*corev1.Secret, er
 
 	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Annotations: map[string]string {
+			Annotations: map[string]string{
 				"configuration.aware.work/write-tofile": files.String(),
 			},
 			Name:      cr.Name,
