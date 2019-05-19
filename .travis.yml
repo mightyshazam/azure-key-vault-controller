@@ -2,8 +2,13 @@ language: go
 go:
   - 1.12.x
 
+sudo: 'required'
+services:
+  - docker
+
 env:
   - DEP_VERSION="0.5.0"
+  - OPERATOR_SDK_VERSION=v0.8.0
 
 before_install:
   - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
@@ -14,14 +19,9 @@ install:
 
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/) # All the .go files, excluding vendor/
-  - go get github.com/golang/lint/golint
-  - go get -u honnef.co/go/tools/cmd/staticcheck
+  - curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu
 
 script:
-  - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
-  - go test -v -race ./...                   # Run all the tests with the race detector enabled
-  - go vet ./...                             # go vet is the official Go static analyzer
-  - staticcheck ./...                          # "go vet on steroids" + linter
-  - golint -set_exit_status $(go list ./...) # one last linter
-  - go build cmd/manager/main.go
-  - docker build -t
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - operator-sdk build awareoss/azure-key-vault-controller:${TRAVIS_TAG}
+  - docker push awareoss/azure-key-vault-controller:${TRAVIS_TAG}
