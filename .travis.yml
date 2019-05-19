@@ -20,8 +20,16 @@ install:
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/) # All the .go files, excluding vendor/
   - curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu
+  - chmod +x operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu && sudo cp operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu
 
 script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - operator-sdk build awareoss/azure-key-vault-controller:${TRAVIS_TAG}
-  - docker push awareoss/azure-key-vault-controller:${TRAVIS_TAG}
+  - operator-sdk build awareoss/azure-key-vault-controller:latest
+  - if [[ "$TRAVIS_BRANCH" == "master" ]] ; then
+      docker tag openresty:alpine /openresty:alpine &&
+      docker push awareoss/azure-key-vault-controller:latest
+    fi
+  - if [[ "$TRAVIS_TAG" ]] ; then
+      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
+      docker tag awareoss/azure-key-vault-controller:latest awareoss/azure-key-vault-controller:$TRAVIS_TAG-alpine
+    fi
