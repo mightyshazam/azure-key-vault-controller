@@ -13,8 +13,7 @@ env:
 before_install:
   - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
   - chmod +x $GOPATH/bin/dep
-  - curl -L -s https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu -o operator-sdk
-  - chmod +x operator-sdk
+  - curl -L -s https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu -o operator-sdk && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin/
 
 install:
   - dep ensure -v
@@ -24,7 +23,7 @@ before_script:
 
 script:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - ./operator-sdk build awareoss/azure-key-vault-controller:latest
+  - operator-sdk build awareoss/azure-key-vault-controller:latest
   - if [[ "$TRAVIS_BRANCH" == "master" ]] ; then
       docker push awareoss/azure-key-vault-controller:latest ;
     fi
