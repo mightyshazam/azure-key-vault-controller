@@ -237,7 +237,7 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret) (*corev1.Secret, er
 	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
-				"configuration.aware.work/write-tofile": files.String(),
+				"secrets.awarehq.com/write-tofile": files.String(),
 			},
 			Name:      cr.Name,
 			Namespace: cr.Namespace,
