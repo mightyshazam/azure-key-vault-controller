@@ -22,7 +22,7 @@ before_script:
 
 script:
   - wget https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu -O operator-sdk
-    - chmod +x operator-sdk
+  - chmod +x operator-sdk
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - ./operator-sdk build awareoss/azure-key-vault-controller:latest
   - if [[ "$TRAVIS_BRANCH" == "master" ]] ; then
