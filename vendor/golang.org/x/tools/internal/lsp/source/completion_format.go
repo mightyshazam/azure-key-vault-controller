@@ -58,9 +58,6 @@ func (c *completer) item(obj types.Object, score float64) CompletionItem {
 		results, writeParens := formatResults(sig.Results(), c.qf)
 		label, detail = formatFunction(obj.Name(), params, results, writeParens)
 		plainSnippet, placeholderSnippet = c.functionCallSnippets(obj.Name(), params)
-		if plainSnippet == nil && placeholderSnippet == nil {
-			insert = ""
-		}
 		kind = FunctionCompletionItem
 		if sig.Recv() != nil {
 			kind = MethodCompletionItem
@@ -107,8 +104,8 @@ func (c *completer) formatBuiltin(obj types.Object, score float64) CompletionIte
 		item.Kind = ConstantCompletionItem
 	case *types.Builtin:
 		item.Kind = FunctionCompletionItem
-		decl := lookupBuiltin(c.view, obj.Name())
-		if decl == nil {
+		decl, ok := lookupBuiltinDecl(c.view, obj.Name()).(*ast.FuncDecl)
+		if !ok {
 			break
 		}
 		params, _ := formatFieldList(c.ctx, c.view, decl.Type.Params)
@@ -125,22 +122,6 @@ func (c *completer) formatBuiltin(obj types.Object, score float64) CompletionIte
 		item.Kind = VariableCompletionItem
 	}
 	return item
-}
-
-func lookupBuiltin(v View, name string) *ast.FuncDecl {
-	builtinPkg := v.BuiltinPackage()
-	if builtinPkg == nil || builtinPkg.Scope == nil {
-		return nil
-	}
-	fn := builtinPkg.Scope.Lookup(name)
-	if fn == nil {
-		return nil
-	}
-	decl, ok := fn.Decl.(*ast.FuncDecl)
-	if !ok {
-		return nil
-	}
-	return decl
 }
 
 var replacer = strings.NewReplacer(
@@ -163,7 +144,7 @@ func formatFieldList(ctx context.Context, v View, list *ast.FieldList) ([]string
 		cfg := printer.Config{Mode: printer.UseSpaces | printer.TabIndent, Tabwidth: 4}
 		b := &bytes.Buffer{}
 		if err := cfg.Fprint(b, v.FileSet(), p.Type); err != nil {
-			v.Logger().Errorf(ctx, "unable to print type %v", p.Type)
+			v.Session().Logger().Errorf(ctx, "unable to print type %v", p.Type)
 			continue
 		}
 		typ := replacer.Replace(b.String())

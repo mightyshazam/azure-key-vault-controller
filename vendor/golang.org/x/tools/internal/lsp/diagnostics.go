@@ -6,6 +6,7 @@ package lsp
 
 import (
 	"context"
+	"strings"
 
 	"golang.org/x/tools/internal/lsp/protocol"
 	"golang.org/x/tools/internal/lsp/source"
@@ -14,12 +15,12 @@ import (
 
 func (s *Server) Diagnostics(ctx context.Context, view source.View, uri span.URI) {
 	if ctx.Err() != nil {
-		s.log.Errorf(ctx, "canceling diagnostics for %s: %v", uri, ctx.Err())
+		s.session.Logger().Errorf(ctx, "canceling diagnostics for %s: %v", uri, ctx.Err())
 		return
 	}
 	reports, err := source.Diagnostics(ctx, view, uri)
 	if err != nil {
-		s.log.Errorf(ctx, "failed to compute diagnostics for %s: %v", uri, err)
+		s.session.Logger().Errorf(ctx, "failed to compute diagnostics for %s: %v", uri, err)
 		return
 	}
 
@@ -40,8 +41,10 @@ func (s *Server) Diagnostics(ctx context.Context, view source.View, uri span.URI
 	// Anytime we compute diagnostics, make sure to also send along any
 	// undelivered ones (only for remaining URIs).
 	for uri, diagnostics := range s.undelivered {
-		s.publishDiagnostics(ctx, view, uri, diagnostics)
-
+		err := s.publishDiagnostics(ctx, view, uri, diagnostics)
+		if err != nil {
+			s.session.Logger().Errorf(ctx, "failed to deliver diagnostic for %s: %v", uri, err)
+		}
 		// If we fail to deliver the same diagnostics twice, just give up.
 		delete(s.undelivered, uri)
 	}
@@ -62,7 +65,7 @@ func (s *Server) publishDiagnostics(ctx context.Context, view source.View, uri s
 func toProtocolDiagnostics(ctx context.Context, v source.View, diagnostics []source.Diagnostic) ([]protocol.Diagnostic, error) {
 	reports := []protocol.Diagnostic{}
 	for _, diag := range diagnostics {
-		_, m, err := newColumnMap(ctx, v, diag.Span.URI())
+		_, m, err := getSourceFile(ctx, v, diag.Span.URI())
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +81,7 @@ func toProtocolDiagnostics(ctx context.Context, v source.View, diagnostics []sou
 			return nil, err
 		}
 		reports = append(reports, protocol.Diagnostic{
-			Message:  diag.Message,
+			Message:  strings.TrimSpace(diag.Message), // go list returns errors prefixed by newline
 			Range:    rng,
 			Severity: severity,
 			Source:   diag.Source,

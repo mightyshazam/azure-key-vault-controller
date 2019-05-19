@@ -82,8 +82,8 @@
 [[projects]]
   name = "github.com/emicklei/go-restful"
   packages = [".","log"]
-  revision = "103c9496ad8f7e687b8291b56750190012091a96"
-  version = "v2.9.4"
+  revision = "b993709ae1a4f6dd19cfa475232614441b11c9d5"
+  version = "v2.9.5"
 
 [[projects]]
   name = "github.com/ghodss/yaml"
@@ -185,7 +185,7 @@
   branch = "master"
   name = "github.com/gophercloud/gophercloud"
   packages = [".","openstack","openstack/identity/v2/tenants","openstack/identity/v2/tokens","openstack/identity/v3/tokens","openstack/utils","pagination"]
-  revision = "1992d5238d782a2ae0063b16eb9705548e6b351b"
+  revision = "b3a23cc94cc51857a508733a0bd3d6ef0bfc16d9"
 
 [[projects]]
   branch = "master"
@@ -292,8 +292,8 @@
 [[projects]]
   name = "github.com/prometheus/client_golang"
   packages = ["prometheus","prometheus/internal","prometheus/promhttp"]
-  revision = "505eaef017263e299324067d40ca2c48f6a2cf50"
-  version = "v0.9.2"
+  revision = "50c4339db732beb2165735d2cde0bff78eb3c5a5"
+  version = "v0.9.3"
 
 [[projects]]
   branch = "master"
@@ -311,7 +311,7 @@
   branch = "master"
   name = "github.com/prometheus/procfs"
   packages = [".","internal/fs"]
-  revision = "5867b95ac084bbfee6ea16595c4e05ab009021da"
+  revision = "9935e8e0588d26307d1d4a07bed7bd47271b6bbd"
 
 [[projects]]
   name = "github.com/rogpeppe/go-internal"
@@ -371,7 +371,7 @@
   branch = "master"
   name = "golang.org/x/oauth2"
   packages = [".","google","internal","jws","jwt"]
-  revision = "9f3314589c9a9136388751d9adae6b0ed400978a"
+  revision = "950ef44c6e079baf075030377d90bf0c7e4b7b7a"
 
 [[projects]]
   branch = "master"
@@ -383,7 +383,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "87c872767d25fb96dfe96c794fd028b38a08440b"
+  revision = "61b9204099cb1bebc803c9ffb9b2d3acd9d457d9"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -401,7 +401,7 @@
   branch = "master"
   name = "golang.org/x/tools"
   packages = ["go/ast/astutil","go/gcexportdata","go/internal/gcimporter","go/internal/packagesdriver","go/packages","go/types/typeutil","imports","internal/fastwalk","internal/gopathwalk","internal/module","internal/semver"]
-  revision = "7c3f65130f290a790cd2a8742f0636e46e345bc2"
+  revision = "d88f79806bbd013f54a668506864ce559edf6f0a"
 
 [[projects]]
   name = "google.golang.org/api"
@@ -419,7 +419,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/api/httpbody","googleapis/rpc/status","protobuf/field_mask"]
-  revision = "995ef27e003f584103ecdd0f98e1a0cc9cbf3395"
+  revision = "bb713bdc0e5239f2b68e560efbe1c701a6fe78f9"
 
 [[projects]]
   name = "google.golang.org/grpc"

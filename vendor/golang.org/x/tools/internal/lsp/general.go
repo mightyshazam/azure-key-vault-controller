@@ -125,7 +125,7 @@ func (s *Server) initialized(ctx context.Context, params *protocol.InitializedPa
 				}},
 			})
 		}
-		for _, view := range s.views {
+		for _, view := range s.session.Views() {
 			config, err := s.client.Configuration(ctx, &protocol.ConfigurationParams{
 				Items: []protocol.ConfigurationItem{{
 					ScopeURI: protocol.NewURI(view.Folder()),
@@ -142,7 +142,7 @@ func (s *Server) initialized(ctx context.Context, params *protocol.InitializedPa
 	}
 	buf := &bytes.Buffer{}
 	PrintVersionInfo(buf, true, false)
-	s.log.Infof(ctx, "%s", buf)
+	s.session.Logger().Infof(ctx, "%s", buf)
 	return nil
 }
 
@@ -169,9 +169,9 @@ func (s *Server) processConfig(view source.View, config interface{}) error {
 	if usePlaceholders, ok := c["usePlaceholders"].(bool); ok {
 		s.usePlaceholders = usePlaceholders
 	}
-	// Check if enhancedHover is enabled.
-	if enhancedHover, ok := c["enhancedHover"].(bool); ok {
-		s.enhancedHover = enhancedHover
+	// Check if user has disabled documentation on hover.
+	if noDocsOnHover, ok := c["noDocsOnHover"].(bool); ok {
+		s.noDocsOnHover = noDocsOnHover
 	}
 	return nil
 }
@@ -189,12 +189,13 @@ func applyEnv(env []string, k string, v interface{}) []string {
 }
 
 func (s *Server) shutdown(ctx context.Context) error {
-	// TODO(rstambler): Cancel contexts here?
 	s.initializedMu.Lock()
 	defer s.initializedMu.Unlock()
 	if !s.isInitialized {
 		return jsonrpc2.NewErrorf(jsonrpc2.CodeInvalidRequest, "server not initialized")
 	}
+	// drop all the active views
+	s.session.Shutdown(ctx)
 	s.isInitialized = false
 	return nil
 }

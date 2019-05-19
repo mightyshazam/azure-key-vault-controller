@@ -24,7 +24,7 @@ type ParameterInformation struct {
 	Label string
 }
 
-func SignatureHelp(ctx context.Context, f File, pos token.Pos) (*SignatureInformation, error) {
+func SignatureHelp(ctx context.Context, f GoFile, pos token.Pos) (*SignatureInformation, error) {
 	fAST := f.GetAST(ctx)
 	pkg := f.GetPackage(ctx)
 	if pkg == nil || pkg.IsIllTyped() {
@@ -89,8 +89,8 @@ func SignatureHelp(ctx context.Context, f File, pos token.Pos) (*SignatureInform
 }
 
 func builtinSignature(ctx context.Context, v View, callExpr *ast.CallExpr, name string, pos token.Pos) (*SignatureInformation, error) {
-	decl := lookupBuiltin(v, name)
-	if decl == nil {
+	decl, ok := lookupBuiltinDecl(v, name).(*ast.FuncDecl)
+	if !ok {
 		return nil, fmt.Errorf("no function declaration for builtin: %s", name)
 	}
 	params, _ := formatFieldList(ctx, v, decl.Type.Params)
