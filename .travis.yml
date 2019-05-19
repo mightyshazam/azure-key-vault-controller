@@ -15,7 +15,7 @@ before_install:
   - chmod +x $GOPATH/bin/dep
 
 install:
-  - dep ensure
+  - dep ensure -v
 
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/) # All the .go files, excluding vendor/
@@ -26,7 +26,6 @@ script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - operator-sdk build awareoss/azure-key-vault-controller:latest
   - if [[ "$TRAVIS_BRANCH" == "master" ]] ; then
-      docker tag openresty:alpine /openresty:alpine &&
       docker push awareoss/azure-key-vault-controller:latest
     fi
   - if [[ "$TRAVIS_TAG" ]] ; then
