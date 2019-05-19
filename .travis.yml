@@ -26,9 +26,9 @@ script:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - ./operator-sdk build awareoss/azure-key-vault-controller:latest
   - if [[ "$TRAVIS_BRANCH" == "master" ]] ; then
-      docker push awareoss/azure-key-vault-controller:latest
+      docker push awareoss/azure-key-vault-controller:latest ;
     fi
   - if [[ "$TRAVIS_TAG" ]] ; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
-      docker tag awareoss/azure-key-vault-controller:latest awareoss/azure-key-vault-controller:$TRAVIS_TAG-alpine
+      docker tag awareoss/azure-key-vault-controller:latest awareoss/azure-key-vault-controller:$TRAVIS_TAG ;
     fi
