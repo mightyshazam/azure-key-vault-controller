@@ -2,9 +2,11 @@ package azurekeyvaultsecret
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	secretsv1alpha1 "github.com/aware-hq/azure-key-vault-controller/pkg/apis/secrets/v1alpha1"
 	kvc "github.com/aware-hq/azure-key-vault-controller/pkg/azurekeyvault/client"
+	"github.com/go-logr/logr"
 	"github.com/spf13/pflag"
 	"reflect"
 	"strings"
@@ -120,7 +122,7 @@ func (r *ReconcileAzureKeyVaultSecret) Reconcile(request reconcile.Request) (rec
 	}
 
 	// Define a new Pod object
-	secret, err := newSecretForCr(instance)
+	secret, err := newSecretForCr(instance, reqLogger)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -205,7 +207,7 @@ func getCredentials() (*kvc.AzureKeyVaultCredentials, error) {
 }
 
 // newSecretForCr returns a secret with the same name/namespace as the cr and the content of the referenced keyvault secrets
-func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret) (*corev1.Secret, error) {
+func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret, log logr.Logger) (*corev1.Secret, error) {
 	kv, err := getKeysClient()
 	if err != nil {
 		return nil, err
@@ -225,12 +227,19 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret) (*corev1.Secret, er
 			return nil, fmt.Errorf("unable to process key %s in secret %s: %v", value.Key, cr.ObjectMeta.Name, err)
 		}
 
-		if value.WriteToFile {
-			files.WriteString(fmt.Sprintf("- %s\n", secretName))
-		}
-
 		if secret.Value != nil {
-			data[secretName] = []byte(*secret.Value)
+			val := []byte(*secret.Value)
+			if value.WriteToFile {
+				files.WriteString(fmt.Sprintf("- %s\n", secretName))
+				val, err = base64.StdEncoding.DecodeString(*secret.Value)
+				if err != nil {
+					log.Error(err, fmt.Sprintf("treating key %s as plain string", value.Key))
+				} else {
+					val = []byte(*secret.Value)
+				}
+			}
+
+			data[secretName] = val
 		}
 	}
 
