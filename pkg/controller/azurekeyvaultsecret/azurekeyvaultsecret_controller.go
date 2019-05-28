@@ -243,7 +243,7 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret, log logr.Logger) (*
 		}
 	}
 
-	return &corev1.Secret{
+	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Annotations: map[string]string{
 				"secrets.awarehq.com/write-tofile": files.String(),
@@ -253,5 +253,11 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret, log logr.Logger) (*
 			Labels:    cr.ObjectMeta.Labels,
 		},
 		Data: data,
-	}, nil
+	}
+
+	if files.Len() > 0 {
+		secret.Annotations["secrets.awarehq.com/write-tofile"] = files.String()
+	}
+
+	return secret, nil
 }
