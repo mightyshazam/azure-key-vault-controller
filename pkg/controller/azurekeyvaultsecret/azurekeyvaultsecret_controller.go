@@ -231,12 +231,9 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret, log logr.Logger) (*
 			val := []byte(*secret.Value)
 			if value.WriteToFile {
 				files.WriteString(fmt.Sprintf("- %s\n", secretName))
-				val, err = base64.StdEncoding.DecodeString(*secret.Value)
-				if err != nil {
-					log.Error(err, fmt.Sprintf("treating key %s as plain string", value.Key))
-				} else {
-					val = []byte(*secret.Value)
-				}
+				val = base64DecodeOrString(value.Key, *secret.Value, log)
+			} else if _, ok := secret.Tags["IsBase64"]; ok {
+				val = base64DecodeOrString(value.Key, *secret.Value, log)
 			}
 
 			data[secretName] = val
@@ -260,4 +257,15 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret, log logr.Logger) (*
 	}
 
 	return secret, nil
+}
+
+
+
+func base64DecodeOrString(key string, content string, log logr.Logger) []byte {
+	val, err := base64.StdEncoding.DecodeString(content)
+	if err != nil {
+		log.Error(err, fmt.Sprintf("treating key %s as plain string", key))
+	}
+
+	return val
 }
