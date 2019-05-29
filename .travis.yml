@@ -25,10 +25,10 @@ before_script:
 script:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - operator-sdk build awareoss/azure-key-vault-controller:latest
-  - if [[ "$TRAVIS_BRANCH" == "master" ]] ; then
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]  && [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
       docker push awareoss/azure-key-vault-controller:latest ;
     fi
-  - if [[ "$TRAVIS_TAG" ]] ; then
+  - if [[ "$TRAVIS_TAG" ]] && [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
       docker tag awareoss/azure-key-vault-controller:latest awareoss/azure-key-vault-controller:$TRAVIS_TAG &&
       docker push awareoss/azure-key-vault-controller:$TRAVIS_TAG ;
