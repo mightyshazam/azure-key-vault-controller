@@ -232,7 +232,7 @@ func newSecretForCr(cr *secretsv1alpha1.AzureKeyVaultSecret, log logr.Logger) (*
 			if value.WriteToFile {
 				files.WriteString(fmt.Sprintf("- %s\n", secretName))
 				val = base64DecodeOrString(value.Key, *secret.Value, log)
-			} else if _, ok := secret.Tags["IsBase64"]; ok {
+			} else if _, ok := secret.Tags["aware.hq.base64"]; ok {
 				val = base64DecodeOrString(value.Key, *secret.Value, log)
 			}
 
