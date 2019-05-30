@@ -265,6 +265,7 @@ func base64DecodeOrString(key string, content string, log logr.Logger) []byte {
 	val, err := base64.StdEncoding.DecodeString(content)
 	if err != nil {
 		log.Error(err, fmt.Sprintf("treating key %s as plain string", key))
+		return []byte(content)
 	}
 
 	return val
